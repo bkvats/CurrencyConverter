@@ -1,40 +1,36 @@
-import { useState } from "react";
-import getRate  from "./getRate";
-function MainBox({desg, currencyname, readOnly = false, resultValue = null, setResultValue = null}) {
-    const [otherCurrencyValue, setOtherCurrencyValue] = useState(1);
-    const [currency, setCurrency] = useState(currencyname);
-    const [currencyList, setCurrencyList] = useState([currency]);
-    async function getCurrencyList() {
-        let p = await fetch(`https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${currency}.json`);
-        let data = await p.json();
-        var currencyMap = data[currency];
-        setCurrencyList(Object.keys(currencyMap));
-    }
+import currencyList from "./newList.json"
+function MainBox({desg, currencyISO, setCurrencyISO, currenyName, setCurrencyName, currencySymbol, setCurrencySymbol, currencyValue, setCurrencyValue = null, currencyRate = null, readOnly=true}) {
     return (
         <div className="mainBox">
             <p>{desg}</p>
-            <h1>{currency.toUpperCase()}</h1>
+            <div className="currencyDetails">
+                <h1>{currencyISO}</h1>
+                <h2>{currenyName} ({currencySymbol})</h2>
+            </div>
             <label htmlFor="currencySelect">Select a Currency:</label>
-            <select id="currencySelect" onClick={getCurrencyList} onChange={(event) => {
-                setCurrency(event.target.value);
-                otherCurrencyValue(currencyMap[event.target.value])
-                }} value={currency}>
+            <select id="currencySelect" value={currencyISO} onChange={(event) => {
+                setCurrencyISO(event.target.value);
+                setCurrencyName(currencyList[event.target.value]["name"]);
+                setCurrencySymbol(currencyList[event.target.value]["symbol"]);
+            }}>
                 {
-                currencyList.map((value, index) => (
-                        <option key={index} value={value}>{value}</option>
+                    Object.keys(currencyList).map((item, index) => (
+                        <option key={index} value={item}>{`${item} (${currencyList[item]["name"]})`}</option>
                     ))
                 }
             </select>
             <input
             type="text"
             readOnly={readOnly}
+            value={currencyValue}
             onChange={(event) => {
                 let value = Number(event.target.value);
                 if (!isNaN(value)) {
-
+                    setCurrencyValue(event.target.value);
                 }
             }}
-            ></input>
+            >
+            </input>
         </div>
     )
 }
